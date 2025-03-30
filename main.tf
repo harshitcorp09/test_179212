@@ -1,3 +1,7 @@
+provider "aws" {
+  region = "us-east-1" # Change if needed
+}
+
 resource "aws_lb_target_group" "target_groups" {
   for_each = var.target_group_configs
 
@@ -28,16 +32,19 @@ resource "aws_lb_target_group" "target_groups" {
 }
 
 resource "aws_lb_target_group_attachment" "tg_attachment" {
-  for_each = {
-    for tg_key, tg_value in var.target_group_configs :
-    for ip in tg_value.target_ips :
-      "${tg_key}-${ip}" => {
-        target_group_key = tg_key
-        target_ip        = ip
-      }
+  for_each = { 
+    for item in flatten([
+      for tg_key, tg_value in var.target_group_configs : [
+        for ip in tg_value.target_ips : {
+          key               = "${tg_key}-${ip}"
+          target_group_key  = tg_key
+          target_ip         = ip
+        }
+      ]
+    ]) : item.key => item
   }
 
   target_group_arn = aws_lb_target_group.target_groups[each.value.target_group_key].arn
   target_id        = each.value.target_ip
-  port            = var.target_group_configs[each.value.target_group_key].port
+  port             = var.target_group_configs[each.value.target_group_key].port
 }
