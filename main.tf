@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "us-east-1" # Change if needed
+  region = "us-west-1" # Change if needed
 }
 
 resource "aws_lb_target_group" "target_groups" {
