@@ -22,5 +22,5 @@ target_group_configs = {
   }
 }
 
-target_vpc_id = "vpc-12345678"
+target_vpc_id = "vpc-0df7ff735db18c010"
 stickiness    = false
